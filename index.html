@@ -115,7 +115,7 @@
         <section id="product-management" class="space-y-6 hidden">
             <h2 class="text-2xl font-bold">Product Management</h2>
             <div class="bg-gray-800 p-6 rounded-lg space-y-4">
-                <h3 class="text-xl font-bold">Add New Product</h3>
+                <h3 id="product-form-title" class="text-xl font-bold">Add New Product</h3>
                 <form id="product-form" class="space-y-4">
                     <div>
                         <label for="product-name" class="block mb-1">Product Name</label>
@@ -141,7 +141,8 @@
                         <label class="block mb-1">Sizes & Prices (Format: 8x10:500,10x12:1000)</label>
                         <textarea id="product-sizes" class="w-full bg-gray-700 rounded-lg p-2" rows="3" placeholder="8x10:500,10x12:1000" required></textarea>
                     </div>
-                    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-bold">Add Product</button>
+                    <button type="submit" id="product-submit-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-bold">Add Product</button>
+                    <button type="button" id="product-cancel-btn" class="w-full bg-gray-600 hover:bg-gray-700 text-white py-2 rounded-lg font-bold hidden">Cancel Edit</button>
                 </form>
             </div>
             <div id="product-list" class="space-y-4">
@@ -242,11 +243,15 @@
         const bkashNumberInput = document.getElementById('bkash-number');
         const bannerUrlsInput = document.getElementById('banner-urls');
         const whatsappNumberInput = document.getElementById('whatsapp-number');
+        const productFormTitle = document.getElementById('product-form-title');
+        const productSubmitBtn = document.getElementById('product-submit-btn');
+        const productCancelBtn = document.getElementById('product-cancel-btn');
         
         // State variables
         let products = [];
         let orders = [];
         let coupons = [];
+        let editingProductId = null;
         
         // Functions to show/hide sections
         function showSection(sectionId) {
@@ -438,6 +443,14 @@
             });
         }
 
+        function resetProductForm() {
+            productForm.reset();
+            productFormTitle.textContent = "Add New Product";
+            productSubmitBtn.textContent = "Add Product";
+            productCancelBtn.classList.add('hidden');
+            editingProductId = null;
+        }
+
         // Render Products
         function renderProducts() {
             productList.innerHTML = '';
@@ -450,12 +463,45 @@
                         <h3 class="font-bold">${product.name}</h3>
                         <p class="text-sm text-gray-400">${product.description.substring(0, 50)}...</p>
                     </div>
-                    <button class="delete-product-btn text-red-400 hover:text-red-500" data-id="${product.id}">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.013 21H7.987a2 2 0 01-1.92-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                    </button>
+                    <div class="flex space-x-2">
+                        <button class="edit-product-btn text-blue-400 hover:text-blue-500" data-id="${product.id}">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
+                                <path d="M13.586 3.586a2 2 0 112.828 2.828l-7.293 7.293-2.828 2.828-2.828-2.828 7.293-7.293zM15 5.5l1.5-1.5-1.5-1.5-1.5 1.5-1.5-1.5L12 4l-1.5 1.5-1.5-1.5-1.5 1.5-1.5-1.5L4 12l1.5-1.5 1.5-1.5-1.5-1.5z" />
+                                <path fill-rule="evenodd" d="M4 13.586l7.293-7.293 2.828 2.828-7.293 7.293L4 13.586zM4 17a1 1 0 100-2 1 1 0 000 2zM15 5.5L13.586 7L17 10.414V17h-3.586L10 13.586l-2.828 2.828L4 13.586V17h3.586l-2.828 2.828zM17 10.414L13.586 7l2.828-2.828L17 10.414z" clip-rule="evenodd" />
+                            </svg>
+                        </button>
+                        <button class="delete-product-btn text-red-400 hover:text-red-500" data-id="${product.id}">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.013 21H7.987a2 2 0 01-1.92-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                        </button>
+                    </div>
                 `;
                 productList.appendChild(productEl);
             });
+
+            document.querySelectorAll('.edit-product-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const productId = e.currentTarget.dataset.id;
+                    const productToEdit = products.find(p => p.id === productId);
+                    if (productToEdit) {
+                        editingProductId = productId;
+                        productFormTitle.textContent = "Edit Product";
+                        productSubmitBtn.textContent = "Update Product";
+                        productCancelBtn.classList.remove('hidden');
+
+                        document.getElementById('product-name').value = productToEdit.name;
+                        document.getElementById('product-desc').value = productToEdit.description;
+                        document.getElementById('product-video-url').value = productToEdit.videoUrl || '';
+                        document.getElementById('product-main-image').value = productToEdit.mainImage;
+                        document.getElementById('product-images').value = productToEdit.images.join(', ');
+                        
+                        const sizesString = productToEdit.sizes.map(s => `${s.size}:${s.price}`).join(',');
+                        document.getElementById('product-sizes').value = sizesString;
+
+                        document.getElementById('product-form').scrollIntoView({ behavior: 'smooth' });
+                    }
+                });
+            });
+
             document.querySelectorAll('.delete-product-btn').forEach(btn => {
                 btn.addEventListener('click', async (e) => {
                     const productId = e.currentTarget.dataset.id;
@@ -469,7 +515,7 @@
                 });
             });
         }
-
+        
         // Render Coupons
         function renderCoupons() {
             couponsList.innerHTML = '';
@@ -529,14 +575,25 @@
                  return;
             }
 
+            const productData = { name, description, videoUrl, mainImage, images, sizes };
+
             try {
-                await addDoc(collection(db, "products"), { name, description, videoUrl, mainImage, images, sizes });
-                alert('Product added successfully!');
-                productForm.reset();
+                if (editingProductId) {
+                    await updateDoc(doc(db, "products", editingProductId), productData);
+                    alert('Product updated successfully!');
+                } else {
+                    await addDoc(collection(db, "products"), productData);
+                    alert('Product added successfully!');
+                }
+                resetProductForm();
             } catch (e) {
-                console.error("Error adding document: ", e);
-                alert('Error adding product.');
+                console.error("Error saving document: ", e);
+                alert('Error saving product. Please check the data.');
             }
+        });
+
+        productCancelBtn.addEventListener('click', () => {
+            resetProductForm();
         });
         
         couponForm.addEventListener('submit', async (e) => {
