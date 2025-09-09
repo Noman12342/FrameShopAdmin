@@ -126,6 +126,10 @@
                         <textarea id="product-desc" class="w-full bg-gray-700 rounded-lg p-2" rows="3" required></textarea>
                     </div>
                     <div>
+                        <label for="product-video-url" class="block mb-1">Video URL (e.g., YouTube link)</label>
+                        <input type="url" id="product-video-url" class="w-full bg-gray-700 rounded-lg p-2">
+                    </div>
+                    <div>
                         <label for="product-main-image" class="block mb-1">Main Image URL</label>
                         <input type="url" id="product-main-image" class="w-full bg-gray-700 rounded-lg p-2" required>
                     </div>
@@ -181,6 +185,10 @@
                         <label for="banner-urls" class="block mb-1">Banner Image URLs (comma-separated)</label>
                         <textarea id="banner-urls" class="w-full bg-gray-700 rounded-lg p-2" rows="3"></textarea>
                     </div>
+                    <div>
+                        <label for="whatsapp-number" class="block mb-1">WhatsApp Order Number</label>
+                        <input type="tel" id="whatsapp-number" class="w-full bg-gray-700 rounded-lg p-2" required>
+                    </div>
                     <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-bold">Save Settings</button>
                 </form>
             </div>
@@ -191,7 +199,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-        import { getFirestore, collection, addDoc, onSnapshot, doc, setDoc, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, onSnapshot, doc, setDoc, deleteDoc, updateDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
         // Firebase Configuration
         const firebaseConfig = {
@@ -233,6 +241,7 @@
         const settingsForm = document.getElementById('settings-form');
         const bkashNumberInput = document.getElementById('bkash-number');
         const bannerUrlsInput = document.getElementById('banner-urls');
+        const whatsappNumberInput = document.getElementById('whatsapp-number');
         
         // State variables
         let products = [];
@@ -335,8 +344,8 @@
         // Data fetching and rendering
         async function fetchData() {
             try {
-                // Listen for orders
-                onSnapshot(collection(db, "orders"), (snapshot) => {
+                // Listen for orders, ordered by creation time descending
+                onSnapshot(query(collection(db, "orders"), orderBy("createdAt", "desc")), (snapshot) => {
                     orders = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                     renderOrders();
                 });
@@ -356,6 +365,7 @@
                         const settings = docSnap.data();
                         bkashNumberInput.value = settings.bkashNumber || '';
                         bannerUrlsInput.value = settings.bannerUrls || '';
+                        whatsappNumberInput.value = settings.whatsappNumber || '';
                     }
                 });
             } catch (e) {
@@ -499,6 +509,7 @@
             e.preventDefault();
             const name = document.getElementById('product-name').value;
             const description = document.getElementById('product-desc').value;
+            const videoUrl = document.getElementById('product-video-url').value;
             const mainImage = document.getElementById('product-main-image').value;
             const images = document.getElementById('product-images').value.split(',').map(url => url.trim());
             
@@ -519,7 +530,7 @@
             }
 
             try {
-                await addDoc(collection(db, "products"), { name, description, mainImage, images, sizes });
+                await addDoc(collection(db, "products"), { name, description, videoUrl, mainImage, images, sizes });
                 alert('Product added successfully!');
                 productForm.reset();
             } catch (e) {
@@ -546,8 +557,9 @@
             e.preventDefault();
             const bkashNumber = bkashNumberInput.value;
             const bannerUrls = bannerUrlsInput.value;
+            const whatsappNumber = whatsappNumberInput.value;
             try {
-                await setDoc(doc(db, "settings", "app_settings"), { bkashNumber, bannerUrls }, { merge: true });
+                await setDoc(doc(db, "settings", "app_settings"), { bkashNumber, bannerUrls, whatsappNumber }, { merge: true });
                 alert('Settings saved successfully!');
             } catch (e) {
                 console.error("Error saving settings: ", e);
