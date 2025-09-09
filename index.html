@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Font (Inter) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0c0c0c;
+            color: #fff;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        .nav-menu {
+            transition: all 0.3s ease-in-out;
+        }
+        .nav-menu.hidden {
+            opacity: 0;
+            transform: scale(0.95);
+            visibility: hidden;
+        }
+    </style>
+</head>
+<body class="bg-[#0c0c0c] text-white">
+
+    <!-- Login/Signup View -->
+    <div id="auth-view" class="container p-8 flex flex-col items-center justify-center min-h-screen">
+        <div id="login-form" class="w-full max-w-md bg-gray-800 p-8 rounded-lg shadow-xl">
+            <h2 class="text-3xl font-bold mb-6 text-center">Admin Login</h2>
+            <form id="login-form-element" class="space-y-4">
+                <div>
+                    <label for="login-email" class="block mb-1">Email</label>
+                    <input type="email" id="login-email" class="w-full bg-gray-700 rounded-lg p-2" required>
+                </div>
+                <div>
+                    <label for="login-password" class="block mb-1">Password</label>
+                    <input type="password" id="login-password" class="w-full bg-gray-700 rounded-lg p-2" required>
+                </div>
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-bold">Login</button>
+            </form>
+            <p class="mt-4 text-center">
+                Don't have an account? <button id="show-signup-btn" class="text-blue-400">Sign Up</button>
+            </p>
+        </div>
+
+        <div id="signup-form" class="w-full max-w-md bg-gray-800 p-8 rounded-lg shadow-xl hidden">
+            <h2 class="text-3xl font-bold mb-6 text-center">Admin Signup</h2>
+            <form id="signup-form-element" class="space-y-4">
+                <div>
+                    <label for="signup-name" class="block mb-1">Full Name</label>
+                    <input type="text" id="signup-name" class="w-full bg-gray-700 rounded-lg p-2" required>
+                </div>
+                <div>
+                    <label for="signup-contact" class="block mb-1">Contact Number</label>
+                    <input type="tel" id="signup-contact" class="w-full bg-gray-700 rounded-lg p-2" required>
+                </div>
+                <div>
+                    <label for="signup-email" class="block mb-1">Email</label>
+                    <input type="email" id="signup-email" class="w-full bg-gray-700 rounded-lg p-2" required>
+                </div>
+                <div>
+                    <label for="signup-password" class="block mb-1">Password</label>
+                    <input type="password" id="signup-password" class="w-full bg-gray-700 rounded-lg p-2" required>
+                </div>
+                <div>
+                    <label for="signup-password-confirm" class="block mb-1">Confirm Password</label>
+                    <input type="password" id="signup-password-confirm" class="w-full bg-gray-700 rounded-lg p-2" required>
+                </div>
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-bold">Sign Up</button>
+            </form>
+            <p class="mt-4 text-center">
+                Already have an account? <button id="show-login-btn" class="text-blue-400">Login</button>
+            </p>
+        </div>
+    </div>
+
+    <!-- Main Admin Panel -->
+    <div id="admin-panel-view" class="container p-8 hidden">
+        <header class="flex justify-between items-center py-4 mb-8">
+            <h1 class="text-3xl font-bold">Admin Dashboard</h1>
+            <div class="relative">
+                <button id="menu-toggle-btn" class="focus:outline-none">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M10 6a2 2 0 110-4 2 2 0 010 4zm0 6a2 2 0 110-4 2 2 0 010 4zm0 6a2 2 0 110-4 2 2 0 010 4z" />
+                    </svg>
+                </button>
+                <div id="menu-bar" class="nav-menu hidden absolute right-0 mt-2 w-48 bg-gray-800 rounded-md shadow-lg py-1 z-50">
+                    <button data-section="order-management" class="block px-4 py-2 text-sm text-gray-200 hover:bg-gray-700 w-full text-left">Order Management</button>
+                    <button data-section="product-management" class="block px-4 py-2 text-sm text-gray-200 hover:bg-gray-700 w-full text-left">Product Management</button>
+                    <button data-section="coupon-management" class="block px-4 py-2 text-sm text-gray-200 hover:bg-gray-700 w-full text-left">Coupon Management</button>
+                    <button data-section="settings" class="block px-4 py-2 text-sm text-gray-200 hover:bg-gray-700 w-full text-left">Settings</button>
+                    <button id="logout-btn" class="block px-4 py-2 text-sm text-red-400 hover:bg-gray-700 w-full text-left">Logout</button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Order Management Section -->
+        <section id="order-management" class="space-y-6 hidden">
+            <h2 class="text-2xl font-bold">Order Management</h2>
+            <div id="orders-list" class="space-y-4">
+                <!-- Orders will be loaded here -->
+            </div>
+        </section>
+
+        <!-- Product Management Section -->
+        <section id="product-management" class="space-y-6 hidden">
+            <h2 class="text-2xl font-bold">Product Management</h2>
+            <div class="bg-gray-800 p-6 rounded-lg space-y-4">
+                <h3 class="text-xl font-bold">Add New Product</h3>
+                <form id="product-form" class="space-y-4">
+                    <div>
+                        <label for="product-name" class="block mb-1">Product Name</label>
+                        <input type="text" id="product-name" class="w-full bg-gray-700 rounded-lg p-2" required>
+                    </div>
+                    <div>
+                        <label for="product-desc" class="block mb-1">Description</label>
+                        <textarea id="product-desc" class="w-full bg-gray-700 rounded-lg p-2" rows="3" required></textarea>
+                    </div>
+                    <div>
+                        <label for="product-main-image" class="block mb-1">Main Image URL</label>
+                        <input type="url" id="product-main-image" class="w-full bg-gray-700 rounded-lg p-2" required>
+                    </div>
+                    <div>
+                        <label for="product-images" class="block mb-1">Additional Image URLs (comma-separated)</label>
+                        <input type="text" id="product-images" class="w-full bg-gray-700 rounded-lg p-2">
+                    </div>
+                    <div>
+                        <label class="block mb-1">Sizes & Prices (Format: 8x10:500,10x12:1000)</label>
+                        <textarea id="product-sizes" class="w-full bg-gray-700 rounded-lg p-2" rows="3" placeholder="8x10:500,10x12:1000" required></textarea>
+                    </div>
+                    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-bold">Add Product</button>
+                </form>
+            </div>
+            <div id="product-list" class="space-y-4">
+                <!-- Products will be loaded here -->
+            </div>
+        </section>
+        
+        <!-- Coupon Management Section -->
+        <section id="coupon-management" class="space-y-6 hidden">
+            <h2 class="text-2xl font-bold">Coupon Management</h2>
+            <div class="bg-gray-800 p-6 rounded-lg space-y-4">
+                <h3 class="text-xl font-bold">Add New Coupon</h3>
+                <form id="coupon-form" class="space-y-4">
+                    <div>
+                        <label for="coupon-code" class="block mb-1">Coupon Code</label>
+                        <input type="text" id="coupon-code" class="w-full bg-gray-700 rounded-lg p-2" required>
+                    </div>
+                    <div>
+                        <label for="coupon-discount" class="block mb-1">Discount (%)</label>
+                        <input type="number" id="coupon-discount" class="w-full bg-gray-700 rounded-lg p-2" min="1" max="100" required>
+                    </div>
+                    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-bold">Add Coupon</button>
+                </form>
+            </div>
+            <div id="coupons-list" class="space-y-4">
+                <!-- Coupons will be loaded here -->
+            </div>
+        </section>
+        
+        <!-- Settings Section -->
+        <section id="settings" class="space-y-6 hidden">
+            <h2 class="text-2xl font-bold">Settings</h2>
+            <div class="bg-gray-800 p-6 rounded-lg space-y-4">
+                <h3 class="text-xl font-bold">App Settings</h3>
+                <form id="settings-form" class="space-y-4">
+                    <div>
+                        <label for="bkash-number" class="block mb-1">Bkash Number</label>
+                        <input type="tel" id="bkash-number" class="w-full bg-gray-700 rounded-lg p-2" required>
+                    </div>
+                    <div>
+                        <label for="banner-urls" class="block mb-1">Banner Image URLs (comma-separated)</label>
+                        <textarea id="banner-urls" class="w-full bg-gray-700 rounded-lg p-2" rows="3"></textarea>
+                    </div>
+                    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-bold">Save Settings</button>
+                </form>
+            </div>
+        </section>
+    </div>
+
+    <!-- Firebase SDK Scripts -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { getFirestore, collection, addDoc, onSnapshot, doc, setDoc, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyD6tX3qiw1pPhYsbX9ukxuY4DBtg2AsFYM",
+            authDomain: "frame-shop-301ed.firebaseapp.com",
+            projectId: "frame-shop-301ed",
+            storageBucket: "frame-shop-301ed.firebasestorage.app",
+            messagingSenderId: "430567411210",
+            appId: "1:430567411210:web:def55cc8b7aaef56b719f3"
+        };
+        
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // UI elements
+        const authView = document.getElementById('auth-view');
+        const adminPanelView = document.getElementById('admin-panel-view');
+        const loginForm = document.getElementById('login-form');
+        const signupForm = document.getElementById('signup-form');
+        const loginFormElement = document.getElementById('login-form-element');
+        const signupFormElement = document.getElementById('signup-form-element');
+        const showSignupBtn = document.getElementById('show-signup-btn');
+        const showLoginBtn = document.getElementById('show-login-btn');
+        const logoutBtn = document.getElementById('logout-btn');
+        const menuToggleBtn = document.getElementById('menu-toggle-btn');
+        const menuBar = document.getElementById('menu-bar');
+
+        const orderManagementSection = document.getElementById('order-management');
+        const productManagementSection = document.getElementById('product-management');
+        const couponManagementSection = document.getElementById('coupon-management');
+        const settingsSection = document.getElementById('settings');
+
+        const ordersList = document.getElementById('orders-list');
+        const productForm = document.getElementById('product-form');
+        const productList = document.getElementById('product-list');
+        const couponForm = document.getElementById('coupon-form');
+        const couponsList = document.getElementById('coupons-list');
+        const settingsForm = document.getElementById('settings-form');
+        const bkashNumberInput = document.getElementById('bkash-number');
+        const bannerUrlsInput = document.getElementById('banner-urls');
+        
+        // State variables
+        let products = [];
+        let orders = [];
+        let coupons = [];
+        
+        // Functions to show/hide sections
+        function showSection(sectionId) {
+            document.querySelectorAll('section').forEach(section => {
+                section.classList.add('hidden');
+            });
+            document.getElementById(sectionId).classList.remove('hidden');
+        }
+
+        // Auth state listener
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                authView.classList.add('hidden');
+                adminPanelView.classList.remove('hidden');
+                showSection('order-management');
+                fetchData();
+            } else {
+                authView.classList.remove('hidden');
+                adminPanelView.classList.add('hidden');
+                showLoginForm();
+            }
+        });
+
+        // Show/hide forms
+        function showLoginForm() {
+            loginForm.classList.remove('hidden');
+            signupForm.classList.add('hidden');
+        }
+        function showSignupForm() {
+            loginForm.classList.add('hidden');
+            signupForm.classList.remove('hidden');
+        }
+
+        // Event Listeners for Auth forms
+        showSignupBtn.addEventListener('click', showSignupForm);
+        showLoginBtn.addEventListener('click', showLoginForm);
+
+        loginFormElement.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+                alert('Login successful!');
+            } catch (error) {
+                alert('Login failed: ' + error.message);
+            }
+        });
+
+        signupFormElement.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('signup-name').value;
+            const contact = document.getElementById('signup-contact').value;
+            const email = document.getElementById('signup-email').value;
+            const password = document.getElementById('signup-password').value;
+            const confirmPassword = document.getElementById('signup-password-confirm').value;
+
+            if (password !== confirmPassword) {
+                alert("Passwords do not match!");
+                return;
+            }
+
+            try {
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                await setDoc(doc(db, "admins", userCredential.user.uid), {
+                    name,
+                    contact,
+                    email
+                });
+                alert('Signup successful!');
+            } catch (error) {
+                alert('Signup failed: ' + error.message);
+            }
+        });
+
+        logoutBtn.addEventListener('click', async () => {
+            await signOut(auth);
+            alert('Logged out successfully!');
+        });
+        
+        menuToggleBtn.addEventListener('click', () => {
+            menuBar.classList.toggle('hidden');
+        });
+        
+        document.querySelectorAll('.nav-menu button').forEach(button => {
+            button.addEventListener('click', (e) => {
+                const section = e.target.dataset.section;
+                if (section) {
+                    showSection(section);
+                    menuBar.classList.add('hidden');
+                }
+            });
+        });
+
+        // Data fetching and rendering
+        async function fetchData() {
+            try {
+                // Listen for orders
+                onSnapshot(collection(db, "orders"), (snapshot) => {
+                    orders = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                    renderOrders();
+                });
+                // Listen for products
+                onSnapshot(collection(db, "products"), (snapshot) => {
+                    products = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                    renderProducts();
+                });
+                // Listen for coupons
+                onSnapshot(collection(db, "coupons"), (snapshot) => {
+                    coupons = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                    renderCoupons();
+                });
+                // Listen for settings
+                onSnapshot(doc(db, "settings", "app_settings"), (docSnap) => {
+                    if (docSnap.exists()) {
+                        const settings = docSnap.data();
+                        bkashNumberInput.value = settings.bkashNumber || '';
+                        bannerUrlsInput.value = settings.bannerUrls || '';
+                    }
+                });
+            } catch (e) {
+                console.error("Error fetching data: ", e);
+            }
+        }
+        
+        // Render Orders
+        function renderOrders() {
+            ordersList.innerHTML = '';
+            if (orders.length === 0) {
+                ordersList.innerHTML = '<p class="text-center text-gray-400">No orders found.</p>';
+            }
+            orders.forEach(order => {
+                const orderEl = document.createElement('div');
+                orderEl.classList.add('bg-gray-800', 'p-4', 'rounded-lg', 'shadow-md');
+                const cartItemsHtml = order.cart.map(item => `
+                    <li class="flex justify-between items-center text-sm">
+                        <span>${item.name} (${item.size}) x ${item.quantity}</span>
+                        <span>${item.price}</span>
+                    </li>
+                `).join('');
+                
+                let discountInfo = '';
+                if (order.appliedCoupon && order.appliedCoupon.discount > 0) {
+                    const discountAmount = order.totalProductsPrice * (order.appliedCoupon.discount / 100);
+                    discountInfo = `<p class="text-sm text-green-400">Discount Applied: ${order.appliedCoupon.discount}% (৳${Math.round(discountAmount)})</p>`;
+                }
+
+                orderEl.innerHTML = `
+                    <h3 class="font-bold text-lg">Order ID: ${order.id}</h3>
+                    <p class="text-sm text-gray-400">Customer: ${order.fullName}</p>
+                    <p class="text-sm text-gray-400">Contact: ${order.contactNumber}</p>
+                    <p class="text-sm text-gray-400">Address: ${order.address}</p>
+                    <ul class="list-disc pl-5 mt-2 text-gray-300">
+                        ${cartItemsHtml}
+                    </ul>
+                    <p class="mt-2 text-sm text-gray-400">Product Total: ৳${order.totalProductsPrice}</p>
+                    <p class="text-sm text-gray-400">Delivery Charge: ৳${order.deliveryCharge}</p>
+                    ${discountInfo}
+                    <p class="mt-2 font-bold text-lg">Final Total: ৳${order.finalPrice}</p>
+                    <p class="text-sm text-gray-400">Delivery Option: ${order.deliveryOption}</p>
+                    <p class="text-sm text-gray-400">Payment Option: ${order.paymentOption}</p>
+                    <p class="text-sm text-gray-400">Bkash Trans ID: ${order.bkashTransId || 'N/A'}</p>
+                    <p class="text-sm text-gray-400">Bkash From: ${order.bkashFromNumber || 'N/A'}</p>
+                    <div class="mt-2 flex items-center space-x-2">
+                        <span>Status:</span>
+                        <select class="status-select bg-gray-700 text-white rounded-md p-1" data-id="${order.id}">
+                            <option value="Pending" ${order.status === 'Pending' ? 'selected' : ''}>Pending</option>
+                            <option value="Processing" ${order.status === 'Processing' ? 'selected' : ''}>Processing</option>
+                            <option value="Shipped" ${order.status === 'Shipped' ? 'selected' : ''}>Shipped</option>
+                            <option value="Delivered" ${order.status === 'Delivered' ? 'selected' : ''}>Delivered</option>
+                        </select>
+                    </div>
+                `;
+                ordersList.appendChild(orderEl);
+            });
+            document.querySelectorAll('.status-select').forEach(select => {
+                select.addEventListener('change', async (e) => {
+                    const orderId = e.target.dataset.id;
+                    const newStatus = e.target.value;
+                    try {
+                        await updateDoc(doc(db, "orders", orderId), { status: newStatus });
+                        alert('Order status updated successfully!');
+                    } catch (e) {
+                        console.error("Error updating status: ", e);
+                        alert('Error updating status.');
+                    }
+                });
+            });
+        }
+
+        // Render Products
+        function renderProducts() {
+            productList.innerHTML = '';
+            products.forEach(product => {
+                const productEl = document.createElement('div');
+                productEl.classList.add('bg-gray-800', 'p-4', 'rounded-lg', 'shadow-md', 'flex', 'items-center', 'space-x-4');
+                productEl.innerHTML = `
+                    <img src="${product.mainImage}" alt="${product.name}" class="w-16 h-16 object-cover rounded-md">
+                    <div class="flex-1">
+                        <h3 class="font-bold">${product.name}</h3>
+                        <p class="text-sm text-gray-400">${product.description.substring(0, 50)}...</p>
+                    </div>
+                    <button class="delete-product-btn text-red-400 hover:text-red-500" data-id="${product.id}">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.013 21H7.987a2 2 0 01-1.92-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                    </button>
+                `;
+                productList.appendChild(productEl);
+            });
+            document.querySelectorAll('.delete-product-btn').forEach(btn => {
+                btn.addEventListener('click', async (e) => {
+                    const productId = e.currentTarget.dataset.id;
+                    try {
+                        await deleteDoc(doc(db, "products", productId));
+                        alert('Product deleted successfully!');
+                    } catch (e) {
+                        console.error("Error deleting product: ", e);
+                        alert('Error deleting product.');
+                    }
+                });
+            });
+        }
+
+        // Render Coupons
+        function renderCoupons() {
+            couponsList.innerHTML = '';
+            if (coupons.length === 0) {
+                couponsList.innerHTML = '<p class="text-center text-gray-400">No coupons found.</p>';
+            }
+            coupons.forEach(coupon => {
+                const couponEl = document.createElement('div');
+                couponEl.classList.add('bg-gray-800', 'p-4', 'rounded-lg', 'shadow-md', 'flex', 'justify-between', 'items-center');
+                couponEl.innerHTML = `
+                    <div>
+                        <h3 class="font-bold">${coupon.code}</h3>
+                        <p class="text-sm text-gray-400">Discount: ${coupon.discount}%</p>
+                    </div>
+                    <button class="delete-coupon-btn text-red-400 hover:text-red-500" data-id="${coupon.id}">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.013 21H7.987a2 2 0 01-1.92-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                    </button>
+                `;
+                couponsList.appendChild(couponEl);
+            });
+            document.querySelectorAll('.delete-coupon-btn').forEach(btn => {
+                btn.addEventListener('click', async (e) => {
+                    const couponId = e.currentTarget.dataset.id;
+                    try {
+                        await deleteDoc(doc(db, "coupons", couponId));
+                        alert('Coupon deleted successfully!');
+                    } catch (e) {
+                        console.error("Error deleting coupon: ", e);
+                        alert('Error deleting coupon.');
+                    }
+                });
+            });
+        }
+        
+        // Form submissions
+        productForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('product-name').value;
+            const description = document.getElementById('product-desc').value;
+            const mainImage = document.getElementById('product-main-image').value;
+            const images = document.getElementById('product-images').value.split(',').map(url => url.trim());
+            
+            let sizes = [];
+            const sizesString = document.getElementById('product-sizes').value;
+            const pairs = sizesString.split(',');
+
+            for (const pair of pairs) {
+                const [size, price] = pair.split(':');
+                if (size && price) {
+                    sizes.push({ size: size.trim(), price: price.trim() });
+                }
+            }
+
+            if (!Array.isArray(sizes) || sizes.length === 0) {
+                 alert('Sizes & Prices must be a valid list of "size:price" pairs, separated by commas.');
+                 return;
+            }
+
+            try {
+                await addDoc(collection(db, "products"), { name, description, mainImage, images, sizes });
+                alert('Product added successfully!');
+                productForm.reset();
+            } catch (e) {
+                console.error("Error adding document: ", e);
+                alert('Error adding product.');
+            }
+        });
+        
+        couponForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const code = document.getElementById('coupon-code').value.toUpperCase();
+            const discount = parseInt(document.getElementById('coupon-discount').value);
+            try {
+                await setDoc(doc(db, "coupons", code), { code, discount });
+                alert('Coupon added successfully!');
+                couponForm.reset();
+            } catch (e) {
+                console.error("Error adding coupon: ", e);
+                alert('Error adding coupon.');
+            }
+        });
+
+        settingsForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const bkashNumber = bkashNumberInput.value;
+            const bannerUrls = bannerUrlsInput.value;
+            try {
+                await setDoc(doc(db, "settings", "app_settings"), { bkashNumber, bannerUrls }, { merge: true });
+                alert('Settings saved successfully!');
+            } catch (e) {
+                console.error("Error saving settings: ", e);
+                alert('Error saving settings.');
+            }
+        });
+    </script>
+</body>
+</html>
